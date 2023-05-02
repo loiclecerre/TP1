@@ -1,23 +1,41 @@
 package org.example;
 
-import java.io.*;
 import java.net.*;
+import java.io.*;
 
 public class Client {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+        String serverName = "localhost"; // le nom ou l'adresse IP du serveur
+        int port = 64555; // le port sur lequel le serveur écoute les connexions
 
-        // Se connecter au serveur sur le port 1234
-        Socket socket = new Socket("localhost", 1234);
+        try {
+            System.out.println("Connecting to " + serverName + " on port " + port);
+            Socket clientSocket = new Socket(serverName, port);
 
-        // Créer un PrintWriter pour envoyer des données au serveur
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            System.out.println("Connected to " + clientSocket.getRemoteSocketAddress());
 
-        // Envoyer un message au serveur
-        out.println("Bonjour serveur!");
+            // ouvrir un flux d'entrée pour recevoir les données envoyées par le serveur
+            InputStream inputStream = clientSocket.getInputStream();
+            BufferedReader inputReader = new BufferedReader(new InputStreamReader(inputStream));
 
-        // Fermer la connexion
-        out.close();
-        socket.close();
+            // ouvrir un flux de sortie pour envoyer des données au serveur
+            OutputStream outputStream = clientSocket.getOutputStream();
+            PrintWriter outputWriter = new PrintWriter(outputStream, true);
+
+            // envoyer une requête au serveur
+            String request = "Hello, server!";
+            outputWriter.println(request);
+
+            // lire la réponse du serveur
+            String response = inputReader.readLine();
+            System.out.println("Server response: " + response);
+
+            // fermer la connexion
+            clientSocket.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
